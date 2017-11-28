@@ -1,0 +1,6 @@
+#!/bin/bash
+#Entrando a directorios de modulo central
+cd /home/arw/WRFV3/run/
+#Ejecutando .wrf
+mpirun -np 35 ./wrf.exe
+

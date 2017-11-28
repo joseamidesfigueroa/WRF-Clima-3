@@ -1,0 +1,101 @@
+#!/bin/sh
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#SCRIPT PARA GENERAR SALIDAS GRAFICAS
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#Ejecuta GrADS y deja productos en carpeta temporal (viento promedio)
+tipo=m2_mes1
+
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run vprom_250.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/250/
+mv t.jpg /home/arw/salidas/$tipo/vprom_250_$tipo.jpg
+
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run vprom_500.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/500/
+mv t.jpg /home/arw/salidas/$tipo/vprom_500_$tipo.jpg
+
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run vprom_850.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/850/
+mv t.jpg /home/arw/salidas/$tipo/vprom_850_$tipo.jpg
+
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run vprom_1000.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/1000/
+mv t.jpg /home/arw/salidas/$tipo/vprom_1000_$tipo.jpg
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#Ejecuta GrADS y deja productos en carpeta temporal (Precipitacion acumulada)
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run lluviamensual.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/
+mv *.jpg /home/arw/salidas/$tipo/
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#Ejecuta GrADS y deja productos en carpeta temporal (TOA OUTGOING LONG WAVE (W m-2) )
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run olr_prom.gs
+EOF
+
+cd /home/arw/trabajo/grads_temp/
+mv olr.jpg /home/arw/salidas/$tipo/olr_prom_$tipo.jpg
+cd /home/arw/salidas/$tipo/
+#composite -dissolve 100% -geometry +25+1200 /home/arw/trabajo/grads/samrelogo.png  olr_prom_$tipo.jpg  olr_prom_$tipo.jpg
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Ejecuta script para extraer lluvia para estaciones
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run precipitacion_por_estaciones_geonode.gs
+EOF
+
+paste -s -d , est* >lluvia
+paste indice_estaciones lluvia>lluvia.txt
+mv lluvia.txt /home/arw/salidas/$tipo/lluvia_$tipo.txt
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Ejecuta script para extraer lluvia para estaciones (Belice)
+cd /home/arw/trabajo/grads/
+grads -blc <<EOF
+open salida.ctl
+run precipitacion_por_estaciones_geonode_belice.gs
+EOF
+
+rm est*
+rm lluvia
+paste -s -d , est* >lluvia
+paste indice_estaciones_belice lluvia>lluvia.txt
+mv lluvia.txt /home/arw/salidas/$tipo/lluvia_Belice_$tipo.txt
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
